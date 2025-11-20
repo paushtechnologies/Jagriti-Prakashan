@@ -9,17 +9,22 @@ export default function Footer({ siteTitle = "Jagriti Prakashan", contactEmail =
     <Box
       component="footer"
       sx={{
-        mt: 3,
-        pt: 6,
-        pb: 4,
+        mt: { xs: 1, md: 4 },
+        pt: { xs: 1, md: 4 },
+        pl: { xs: 2, md: 6 },
+        pr: { xs: 2, md: 6 },
+        pb: { xs: 4, md: 6 },
         position: "relative",
         color: "#fff", // All text white
         background: `linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url(${getAssetPath("assets/footershell.jpg")})`,
         backgroundSize: "cover",
-        backgroundPosition: "center"
+        backgroundPosition: "center",
+        // textAlign: "center",
       }}
     >
-      <Grid container spacing={4} sx={{ maxWidth: 1200, mx: "auto" }}>
+      <Grid container spacing={4} sx={{ maxWidth: "100%", // Ensure footer does not exceed viewport width
+        overflowX: "hidden", // Prevent horizontal scrolling
+        mx: "auto" }}>
         {/* Publisher Info */}
         <Grid item xs={12} md={4}>
           <Typography variant="h6" sx={{ mb: 1, fontWeight: 700 }}>{siteTitle}</Typography>
@@ -105,7 +110,7 @@ export default function Footer({ siteTitle = "Jagriti Prakashan", contactEmail =
 
       <Box sx={{ textAlign: "center", mt: 4 }}>
         <Typography variant="caption">
-          © {new Date().getFullYear()} {siteTitle}. All rights reserved. Payments are verified manually. PAN/GST data may be stored in Google Sheets.
+          © {new Date().getFullYear()} {siteTitle}. All rights reserved.
         </Typography>
       </Box>
     </Box>

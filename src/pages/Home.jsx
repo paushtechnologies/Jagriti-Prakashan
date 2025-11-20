@@ -30,26 +30,39 @@ export default function Home({ books = [], addToCart }) {
   };
 
   return (
-    <Box sx={{ px: { xs: 2, sm: 0 }, pt: 24, maxWidth: "1400px", mx: "auto" }}>
+    <Box sx={{ px: { xs: 0, sm: 0 }, pt: { xs: 20, sm: 24 }, maxWidth: "1400px", mx: "auto" }}>
       {/* Banner Carousel */}
-      <Box sx={{ mb: 4 }}>
+      <Box sx={{ mb: { xs: 2, sm: 4 } }}>
         <BookCarousel books={banners} bannerMode />
       </Box>
 
       {/* Popular books */}
-      <Typography variant="h6" sx={{ mt: 4, mb: 2, color: "primary.main" }}>
+      <Typography variant="h6" sx={{ mt: { xs: 2, sm: 4 }, mb: { xs: 1, sm: 2 }, color: "primary.main" }}>
         Popular Books
       </Typography>
-      <Box sx={{ display: "flex", gap: 2, pb: 1 }}>
-        {featured.slice(0, 5).map((book) => (
-          <Box key={book.id} sx={{ flex: "1 1 0" }}>
-            <BookCard book={book} onAddToCart={addToCart} />
-          </Box>
-        ))}
+      <Box sx={{ mb: { xs: 0.5, sm: 1 } }}>
+        <Box
+          sx={{
+            display: "flex",
+            gap: { xs: 1, sm: 2 },
+            overflowX: "auto",
+            scrollBehavior: "smooth",
+            scrollbarWidth: "none",
+            "&::-webkit-scrollbar": { display: "none" },
+            scrollSnapType: "x mandatory",
+            pb: { xs: 0.5, sm: 1 },
+          }}
+        >
+          {featured.slice(0, 5).map((book) => (
+            <Box key={book.id} sx={{ flex: { xs: "0 0 100px", sm: "0 0 180px" }, scrollSnapAlign: "start" }}>
+              <BookCard book={book} onAddToCart={addToCart} />
+            </Box>
+          ))}
+        </Box>
       </Box>
 
       {/* All categories preview */}
-      <Box sx={{ mt: 6 }}>
+      <Box sx={{ mt: { xs: 3, sm: 6 } }}>
         {categories.map((category, index) => {
           const booksInCategory = books.filter((b) => b.category === category);
           const previewBooks = booksInCategory.slice(0, 4);
@@ -58,20 +71,19 @@ export default function Home({ books = [], addToCart }) {
           const bgColor = index % 2 === 0 ? "rgba(13, 27, 42, 0.05)" : "transparent";
 
           return (
-            <Box key={category} sx={{ mb: 4, bgcolor: bgColor, p: 2, borderRadius: 1 }}>
+            <Box key={category} sx={{ mb: { xs: 2, sm: 4 }, bgcolor: bgColor, p: { xs: 1, md: 2 }, borderRadius: 1 }}>
               {/* Category Title */}
-              <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
+              <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: { xs: 1, sm: 2 } }}>
                 <Typography variant="h5" fontWeight={700}>
                   {category}
                 </Typography>
               </Box>
-
               {/* Category Row with always-visible More button */}
-              <Box sx={{ display: "flex", gap: 2 }}>
+              <Box sx={{ display: "flex", gap: { xs: 0, md: 0 } }}>
                 <Box
                   sx={{
                     display: "flex",
-                    gap: 2,
+                    gap: { xs: 1, md: 2 },
                     overflowX: "auto",
                     scrollBehavior: "smooth",
                     scrollbarWidth: "none",
@@ -81,7 +93,7 @@ export default function Home({ books = [], addToCart }) {
                   ref={el => rowRefs.current[category] = el}
                 >
                   {booksInCategory.map((book) => (
-                    <Box key={book.id} sx={{ flex: "0 0 250px", scrollSnapAlign: "start" }}>
+                    <Box key={book.id} sx={{ flex: { xs: "0 0 110px", md: "0 0 150px" }, scrollSnapAlign: "start" }}>
                       <BookCard book={book} onAddToCart={addToCart} />
                     </Box>
                   ))}
@@ -115,7 +127,7 @@ export default function Home({ books = [], addToCart }) {
                     >
                       <ArrowForwardIos
                         sx={{
-                          fontSize: 32,
+                          fontSize: { xs: 20, sm: 32 },
                           writingMode: "vertical-rl",
                           textOrientation: "mixed",
                           color: "rgba(255,255,255,1)",
@@ -133,7 +145,7 @@ export default function Home({ books = [], addToCart }) {
       </Box>
 
       {/* Gallery CTA */}
-      <Box sx={{ mt: 6, textAlign: "center" }}>
+      <Box sx={{ mt: { xs: 3, sm: 6 }, textAlign: "center" }}>
         <Typography variant="h6">Want to see all books?</Typography>
         <Box
           component="button"

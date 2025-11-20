@@ -8,6 +8,7 @@ import {
   ThemeProvider,
 } from "@mui/material";
 import { getAssetPath } from "./utils/assetPath";
+import { loadCart, saveCart, subscribeCartChanges } from "./utils/cartStorage";
 import Home from "./pages/Home";
 import SearchResults from "./pages/SearchResults";
 import Category from "./pages/Category";
@@ -19,12 +20,12 @@ import PayPage from "./pages/PayPage";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import SidebarCategories from "./components/SidebarCategories";
+import CheckoutFab from "./components/CheckoutFab";
+import { Box } from "@mui/material";
 import booksData from "./data/books.json";
 import { SITE } from "./config";
 import MediaAndMoments from "./pages/MediaAndMoments";
 import ScrollToTop from "./components/ScrollToTop";
-
-const STORAGE_KEY = "publisher_cart_v1";
 
 function App() {
   const navigate = useNavigate();
@@ -65,69 +66,83 @@ function App() {
         shape: { borderRadius: 12 },
         components: {
           MuiCssBaseline: {
-            styleOverrides: {
+            styleOverrides: (theme) => ({
               body: {
                 ...(mode === "light"
                   ? {
-                      backgroundImage: `url('${getAssetPath("assets/mainbg.jpg")}')`,
+                      // Desktop/tablet default
+                      background: `url('${getAssetPath("assets/mainbg.jpg")}')`,
                       backgroundSize: "cover",
                       backgroundRepeat: "no-repeat",
                       backgroundAttachment: "fixed",
                       backgroundPosition: "bottom",
+
+                      // MOBILE OVERRIDE (remove image)
+                      [theme.breakpoints.down("sm")]: {
+                        background:
+                          "linear-gradient(135deg, #f8f4ee 0%, #f6ede2 35%, #e3cbb1 70%, #d7a77a 100%)",
+                        backgroundSize: "cover",
+                        backgroundPosition: "center",
+                        backgroundAttachment: "fixed",
+                      },
                     }
                   : {
-                      backgroundImage: "none", // no image in dark mode
-                      backgroundColor: "#1D1E20", // fallback
+                      backgroundImage: "none",
+                      backgroundColor: "#1D1E20",
                     }),
               },
-            },   
+            }),
           },
         },
       }),
     [mode]
   );
 
-
   const [books] = useState(booksData);
-  const [cart, setCart] = useState([]);
+  const [cart, setCart] = useState(() => loadCart());
 
+  // Persist cart (debounced) whenever it changes
   useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      try {
-        setCart(JSON.parse(saved));
-      } catch {
-        setCart([]);
-      }
-    }
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(cart));
+    saveCart(cart);
   }, [cart]);
 
+  // Sync cart across tabs
+  useEffect(() => {
+    const unsubscribe = subscribeCartChanges((newCart) => {
+      setCart(newCart || []);
+    });
+    return unsubscribe;
+  }, []);
+
   const addToCart = (bookId, qty = 1) => {
-  setCart((prevCart) => {
-    const book = books.find((b) => b.id === bookId);
-    if (!book) return prevCart;
+    setCart((prevCart) => {
+      const book = books.find((b) => b.id === bookId);
+      if (!book) return prevCart;
 
-    // find index of book in cart
-    const index = prevCart.findIndex((item) => item.id === bookId);
+      // find index of book in cart
+      const index = prevCart.findIndex((item) => item.id === bookId);
 
-    if (index >= 0) {
-      // update qty safely
-      const updatedCart = [...prevCart];
-      updatedCart[index] = {
-        ...updatedCart[index],
-        qty: Math.min(999, updatedCart[index].qty + Number(qty)),
-      };
-      return updatedCart;
-    } else {
-      return [...prevCart, { id: book.id, title: book.title, price: book.price, qty: Number(qty) }];
-    }
-  });
-};
-
+      if (index >= 0) {
+        // update qty safely
+        const updatedCart = [...prevCart];
+        updatedCart[index] = {
+          ...updatedCart[index],
+          qty: Math.min(999, updatedCart[index].qty + Number(qty)),
+        };
+        return updatedCart;
+      } else {
+        return [
+          ...prevCart,
+          {
+            id: book.id,
+            title: book.title,
+            price: book.price,
+            qty: Number(qty),
+          },
+        ];
+      }
+    });
+  };
 
   const updateQty = (bookId, qty) =>
     setCart((prev) =>
@@ -156,7 +171,8 @@ function App() {
         mode={mode}
       />
       <div style={{ display: "flex" }}>
-        {(location.pathname === "/" || location.pathname.startsWith("/book/")) && <SidebarCategories />}
+        {(location.pathname === "/" ||
+          location.pathname.startsWith("/book/")) && <SidebarCategories />}
         <Container maxWidth="lg" sx={{ mt: 2, mb: 6, flex: 1 }}>
           <Routes>
             <Route
@@ -200,10 +216,11 @@ function App() {
           </Routes>
         </Container>
       </div>
-      <Footer
-        siteTitle={SITE.title}
-        contactEmail={SITE.contactEmail}
-      />
+      {/* Mobile-only global checkout FAB (visible on xs only) */}
+      <Box sx={{ display: { xs: "block", sm: "none" } }}>
+        <CheckoutFab cartCount={cartCount} onClick={() => navigate("/cart", { state: { scrollToCheckout: true } })} />
+      </Box>
+      <Footer siteTitle={SITE.title} contactEmail={SITE.contactEmail} />
     </ThemeProvider>
   );
 }

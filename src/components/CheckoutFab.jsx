@@ -13,7 +13,7 @@ export default function CheckoutFab({ cartCount = 0, onClick }) {
       sx={{
         position: "fixed",
         bottom: { xs: 16, md: 32 },
-        right: { xs: 16, md: 12 },
+        right: { xs: 16, md: 48 },
         zIndex: 1200,
         boxShadow: 6,
         fontWeight: 700,
@@ -24,7 +24,6 @@ export default function CheckoutFab({ cartCount = 0, onClick }) {
       <Badge badgeContent={cartCount} color="success" sx={{ mr: 1 }}>
         <ShoppingCartIcon sx={{ fontSize: 28 }} />
       </Badge>
-      Checkout
     </Fab>
   );
 }

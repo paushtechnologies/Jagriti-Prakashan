@@ -72,6 +72,8 @@ export default function SidebarCategories() {
         position: "sticky",
         top: 160, // Fixed top position to account for both header bars
         overflowY: "auto",
+        overflowX: "hidden", // Prevent horizontal scrolling
+        maxWidth: "100%", // Ensure sidebar does not exceed viewport width
         "&::-webkit-scrollbar": { display: "none" },
         "-ms-overflow-style": "none",
         "scrollbar-width": "none",

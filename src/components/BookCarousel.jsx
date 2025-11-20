@@ -35,14 +35,14 @@ export default function BookCarousel({
         position: "relative",
         width: "100%",
         overflow: "hidden",
-        borderRadius: 3,
+        borderRadius: { xs: 2, md: 3},
       }}
     >
       <IconButton
         onClick={handlePrev}
         sx={{
           position: "absolute",
-          left: 8,
+          left: {xs: 2, md: 8},
           top: "45%",
           zIndex: 10,
           bgcolor: "rgba(255,255,255,0.8)",
@@ -51,7 +51,7 @@ export default function BookCarousel({
         <ArrowBackIos />
       </IconButton>
 
-      <Box sx={{ display: "flex", gap: 2, transition: "transform 400ms ease" }}>
+      <Box sx={{ display: "flex", gap: { xs: 1, sm: 2 }, transition: "transform 400ms ease" }}>
         {slice.map((b, idx) =>
           bannerMode ? (
             <Paper
@@ -65,14 +65,14 @@ export default function BookCarousel({
                 })`,
                 backgroundSize: "cover",
                 backgroundPosition: "center",
-                borderRadius: 3,
+                borderRadius: { xs: 2, md: 3 },
                 display: "flex",
                 alignItems: "flex-end",
               }}
             >
               <Box
                 sx={{
-                  p: 2,
+                  p: { xs: 1, sm: 1.5 },
                   width: "100%",
                   background: `linear-gradient(
       45deg,
@@ -84,11 +84,24 @@ export default function BookCarousel({
               >
                 <Typography
                   variant="h5"
-                  sx={{ color: "white", fontWeight: 800 }}
+                  gutterBottom={false}
+                  sx={{
+                    color: "white",
+                    fontWeight: { xs: 600, md: 800 },
+                    fontSize: { xs: "0.95rem", sm: "1.1rem", md: "1.5rem" },
+                    lineHeight: {xs: 0.75, md: 1.1},
+                    marginLeft: { xs: 1, md: 1 },
+                    mb:"0 !important"
+                  }}
                 >
                   {b.title || ""}
                 </Typography>
-                <Typography variant="body2" sx={{ color: "white" }}>
+                <Typography variant="body2" 
+                  sx={{ 
+                    color: "white",
+                    mt: "0 !important",
+                    marginLeft: { xs: 1, md: 1 }
+                    }}>
                   {b.subtitle || ""}
                 </Typography>
               </Box>
@@ -106,7 +119,7 @@ export default function BookCarousel({
         onClick={handleNext}
         sx={{
           position: "absolute",
-          right: 8,
+          right: {xs: 2, md: 8},
           top: "45%",
           zIndex: 10,
           bgcolor: "rgba(255,255,255,0.8)",

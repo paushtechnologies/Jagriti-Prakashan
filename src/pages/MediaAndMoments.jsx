@@ -11,12 +11,11 @@ const carouselImages = [
   "/assets/program5.jpg",
 ];
 
-// Timeline years and demo photos
+// All photos (flattened, no year grouping)
 const years = Array.from({ length: 10 }, (_, i) => 2025 - i);
-const photosByYear = years.map((year, idx) => ({
-  year,
-  images: Array.from({ length: 3 }, (_, i) => `/assets/program${((idx + i) % 5) + 1}.jpg`),
-}));
+const allPhotos = years.flatMap((year, idx) =>
+  Array.from({ length: 3 }, (_, i) => `/assets/program${((idx + i) % 5) + 1}.jpg`)
+);
 
 export default function MediaAndMoments() {
   const [currentCarousel, setCurrentCarousel] = useState(0);
@@ -30,15 +29,17 @@ export default function MediaAndMoments() {
   }, []);
 
   return (
-    <Box sx={{ mt: 22, mb: 6 }}>
+    <Box sx={{ mt: { xs: 20, sm: 22 }, mb: { xs: 4, sm: 6 }, px: { xs: 1, sm: 0 } }}>
       {/* Carousel */}
-      <Box sx={{ mb: 4, position: "relative", overflow: "hidden", borderRadius: 2, height: 300 }}>
+      <Box sx={{ mb: { xs: 3, sm: 6 }, position: "relative", overflow: "hidden", borderRadius: 2, height: { xs: 160, sm: 300 } }}>
         {carouselImages.map((img, idx) => (
           <Box
             key={idx}
             component="img"
             src={img}
             alt={`Carousel ${idx}`}
+            loading="lazy"
+            decoding="async"
             sx={{
               width: "100%",
               height: "100%",
@@ -52,28 +53,35 @@ export default function MediaAndMoments() {
         ))}
       </Box>
 
-      {/* Photos grouped by year */}
+      {/* Photos in responsive grid */}
       <Box>
-        {photosByYear.map((yearItem) => (
-          <Box key={yearItem.year} sx={{ mb: 4 }}>
-            <Grid container spacing={2}>
-              {yearItem.images.map((img, i) => (
-                <Grid item xs={12} sm={4} md={4} key={i}>
-                  <Card sx={{ borderRadius: 2, overflow: "hidden", boxShadow: 3 }}>
-                    <CardMedia
-                      component="img"
-                      height="350"
-                      width ="500"
-                      image={img}
-                      alt={`Year ${yearItem.year}`}
-                      sx={{ objectFit: "cover" }}
-                    />
-                  </Card>
-                </Grid>
-              ))}
+        <Grid container spacing={{ xs: 1.5, sm: 3 }}>
+          {allPhotos.map((img, i) => (
+            <Grid item xs={4} sm={6} md={4} key={i}>
+              <Card
+                sx={{
+                  borderRadius: 2,
+                  overflow: "hidden",
+                  boxShadow: 3,
+                  transition: "transform 0.3s ease, boxShadow 0.3s ease",
+                  "@media (max-width:600px)": {
+                    transition: 'none',
+                    '&:hover': { transform: 'none', boxShadow: 3 }
+                  }
+                }}
+              >
+                <CardMedia
+                  component="img"
+                  image={img}
+                  alt={`Photo ${i + 1}`}
+                  loading="lazy"
+                  decoding="async"
+                  sx={{ objectFit: "cover", height: { xs: 110, sm: 200, md: 300 }, width: '100%' }}
+                />
+              </Card>
             </Grid>
-          </Box>
-        ))}
+          ))}
+        </Grid>
       </Box>
     </Box>
   );

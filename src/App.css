@@ -25,6 +25,7 @@
 html, body {
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* IE 10+ */
+  overflow-x: hidden; /* Prevent horizontal scrolling globally */
 }
 /* Fully hide scrollbar for custom scroll container */
 html::-webkit-scrollbar, body::-webkit-scrollbar {
@@ -102,3 +103,47 @@ html::-webkit-scrollbar, body::-webkit-scrollbar, .scrollbar-hide::-webkit-scrol
 /* Works for Firefox */
 /* For other scrollable containers, add class 'scrollbar-hide' */
 /* Example: <div class="scrollbar-hide">...</div> */
+
+@media (max-width: 768px) {
+  #root {
+    padding: 1rem; /* Adjust padding for smaller screens */
+  }
+
+  .card {
+    padding: 1rem; /* Reduce card padding for mobile */
+  }
+
+  .logo {
+    height: 4em; /* Scale down logo size */
+  }
+}
+
+/* Global mobile padding reductions for common MUI components */
+@media (max-width: 600px) {
+  /* root padding */
+  #root { padding: 0.5rem; }
+
+  /* Paper containers */
+  .MuiPaper-root { padding: 8px !important; }
+
+  /* Card content */
+  .MuiCardContent-root { padding: 8px !important; }
+
+  /* Buttons: reduce padding but keep touch area reasonable */
+  .MuiButton-root { padding: 6px 10px !important; min-height: 34px !important; }
+
+  /* Table cells and headers */
+  .MuiTableCell-root, .MuiTableHead-root th { padding: 6px 8px !important; }
+
+  /* Dialog and modal content */
+  .MuiDialogContent-root, .MuiPopover-root { padding: 8px !important; }
+
+  /* Inputs */
+  .MuiInputBase-root { padding: 6px 8px !important; }
+
+  /* TextField full-width spacing */
+  .MuiTextField-root { margin-bottom: 8px !important; }
+
+  /* Reduce global gaps */
+  .MuiGrid-spacing-xs-2 > .MuiGrid-item { padding: 4px !important; }
+}
