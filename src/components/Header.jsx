@@ -108,7 +108,7 @@ export default function Header({ cartCount = 0, onCart, onToggleMode, mode }) {
         position="fixed"
         elevation={3}
         sx={{
-          background: `linear-gradient(rgba(0,0,0,0), rgba(0,0,0,0.6)), url(${getAssetPath(
+          background: `linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.3)), url(${getAssetPath(
             "assets/footershell.jpg"
           )})`,
           backgroundSize: "cover",
@@ -156,7 +156,7 @@ export default function Header({ cartCount = 0, onCart, onToggleMode, mode }) {
               display: { xs: "flex", sm: "none" },
               color: "white",
               position: "absolute",
-              left: 0,
+              left: 5,
               top: 30,
             }}
           >
@@ -221,7 +221,7 @@ export default function Header({ cartCount = 0, onCart, onToggleMode, mode }) {
               cursor: "pointer",
               mt: 1,
               pb: 0,
-              minHeight: "110px",
+              minHeight: "100px",
             }}
             onClick={() => navigate("/")}
           >
@@ -243,9 +243,9 @@ export default function Header({ cartCount = 0, onCart, onToggleMode, mode }) {
                 alt="Logo"
                 sx={{
                   width: 50,
-                  height: 50,
+                  height: 70,
                   borderRadius: "50%",
-                  mr: 1, // zero gap
+                  mr: 0.5, // zero gap
                 }}
               />
 
@@ -298,7 +298,7 @@ export default function Header({ cartCount = 0, onCart, onToggleMode, mode }) {
               <Box
                 sx={{
                   width: 50,
-                  height: 50,
+                  height: 70,
                   visibility: "hidden",
                 }}
               />
@@ -343,7 +343,7 @@ export default function Header({ cartCount = 0, onCart, onToggleMode, mode }) {
             sx={{
               display: { xs: "flex", sm: "none" },
               position: "absolute",
-              right: 0,
+              right: 5,
               top: 30,
             }}
           >
@@ -396,7 +396,7 @@ export default function Header({ cartCount = 0, onCart, onToggleMode, mode }) {
             "linear-gradient(90deg, rgba(13,27,42,0.9) 0%, rgba(13,27,42,0.7) 20%, #FFB74D 50%, rgba(13,27,42,0.6) 80%, rgba(13,27,42,0.8) 100%)",
           height: 40,
           justifyContent: "center",
-          top: "118px",
+          top: { xs: "108px", sm: "118px" },
         }}
       >
         <Toolbar
@@ -419,7 +419,7 @@ export default function Header({ cartCount = 0, onCart, onToggleMode, mode }) {
             {window.innerWidth < 600 ? "About" : "About Us"}
           </Button>
           <Button sx={{ color: "#fff" }} onClick={() => navigate("/media")}>
-            {window.innerWidth < 600 ? "M&M" : "Media & Moments"}
+            {window.innerWidth < 600 ? "Media" : "Media & Moments"}
           </Button>
         </Toolbar>
       </AppBar>

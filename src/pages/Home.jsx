@@ -11,9 +11,30 @@ export default function Home({ books = [], addToCart }) {
 
   // Banner carousel items
   const banners = [
-    { banner: "banner-1.svg", title: "नवीनतम पुस्तकें", subtitle: "Explore our newest releases" },
-    { banner: "banner-2.svg", title: "Back to School", subtitle: "Essential books for learners" },
-    { banner: "banner-3.svg", title: "Special Discounts", subtitle: "Limited time offers" }
+    {
+      banner: "1.png", // desktop
+      bannerMobile: "1-mobile.png", // mobile
+      title: "",
+      subtitle: ""
+    },
+    {
+      banner: "2.png",
+      bannerMobile: "2-mobile.png",
+      title: "",
+      subtitle: ""
+    },
+    {
+      banner: "3.jpg",
+      bannerMobile: "3-mobile.jpg",
+      title: "Winter Reads",
+      subtitle: "Books to enjoy this winter"
+    },
+    {
+      banner: "4.png",
+      bannerMobile: "4-mobile.png",
+      title: "",
+      subtitle: ""
+    },
   ];
 
   const featured = books.slice(0, 8);
