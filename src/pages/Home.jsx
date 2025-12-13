@@ -24,16 +24,22 @@ export default function Home({ books = [], addToCart }) {
       subtitle: ""
     },
     {
-      banner: "3.jpg",
-      bannerMobile: "3-mobile.jpg",
-      title: "Winter Reads",
-      subtitle: "Books to enjoy this winter"
+      banner: "3.png",
+      bannerMobile: "3-mobile.png",
+      title: "Media and Moments",
+      subtitle: ""
     },
     {
       banner: "4.png",
       bannerMobile: "4-mobile.png",
       title: "",
       subtitle: ""
+    },
+    {
+      banner: "5.jpg",
+      bannerMobile: "5-mobile.jpg",
+      title: "Winter Reads",
+      subtitle: "Books to enjoy this winter"
     },
   ];
 

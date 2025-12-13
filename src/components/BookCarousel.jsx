@@ -19,7 +19,7 @@ export default function BookCarousel({
   useEffect(() => {
     const t = setInterval(() => {
       setIndex((i) => (i < maxIndex ? i + 1 : 0));
-    }, 6000);
+    }, 10000);
     return () => clearInterval(t);
   }, [maxIndex]);
 

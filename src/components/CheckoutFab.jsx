@@ -12,7 +12,7 @@ export default function CheckoutFab({ cartCount = 0, onClick }) {
       variant="extended"
       sx={{
         position: "fixed",
-        bottom: { xs: 16, md: 32 },
+        bottom: { xs: 24, md: 32 },
         right: { xs: 16, md: 48 },
         zIndex: 1200,
         boxShadow: 6,

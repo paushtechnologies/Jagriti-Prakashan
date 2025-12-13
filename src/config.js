@@ -4,7 +4,7 @@
 // - bankDetails: displayed on "Pay Now" modal.
 // - upiVPA and upiQRImage: for UPI payment (static QR).
 export const SITE = {
-  title: "Jagriti Prakashan",
+  title: "जागृति प्रकाशन",
   contactEmail: "orders@jagritiprakashan.example",
   // If empty, order submit to sheet is disabled and site will show a clear message.
   sheetsWebhookUrl: "YOUR_WEB_APP_URL_HERE",

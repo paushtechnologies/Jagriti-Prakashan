@@ -8,8 +8,10 @@ const carouselImages = [
   getAssetPath("assets/MnM/53.jpg"),
   getAssetPath("assets/MnM/18.jpg"),
   getAssetPath("assets/MnM/15.jpg"),
+  getAssetPath("assets/MnM/61.png"),
   getAssetPath("assets/MnM/54.jpg"),
   getAssetPath("assets/MnM/59.jpg"),
+  getAssetPath("assets/MnM/62.png"),
 ];
 
 // All photos (1–60)
@@ -39,7 +41,7 @@ export default function MediaAndMoments() {
         setPrevCarousel(prev); // track old slide for tiles
         return next;
       });
-    }, 6000);
+    }, 4000);
     return () => clearInterval(interval);
   }, []);
 
