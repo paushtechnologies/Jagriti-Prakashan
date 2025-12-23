@@ -1,7 +1,7 @@
 // src/components/BookCarousel.jsx
 import React, { useState, useEffect } from "react";
 import { Box, IconButton, Typography, Paper } from "@mui/material";
-import { ArrowForwardIos } from "@mui/icons-material";
+import { ArrowForwardIos, PlayArrow, Pause } from "@mui/icons-material";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 
 /**
@@ -12,17 +12,24 @@ export default function BookCarousel({
   books = [],
   onAddToCart,
   bannerMode = false,
+  autoPlay = true,
+  autoPlayInterval = 3000,
 }) {
   const [index, setIndex] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(autoPlay);
+
   const visible = bannerMode ? 1 : 4;
   const maxIndex = Math.max(0, Math.ceil(books.length / visible) - 1);
 
   useEffect(() => {
+    if (!isPlaying || maxIndex === 0) return;
+
     const t = setInterval(() => {
       setIndex((i) => (i < maxIndex ? i + 1 : 0));
-    }, 3000);
+    }, autoPlayInterval);
+
     return () => clearInterval(t);
-  }, [maxIndex]);
+  }, [isPlaying, autoPlayInterval, maxIndex]);
 
   const handlePrev = () => setIndex((i) => Math.max(0, i - 1));
   const handleNext = () => setIndex((i) => Math.min(maxIndex, i + 1));
@@ -37,7 +44,6 @@ export default function BookCarousel({
 
   // --------------- AUTO TEXT COLOR START ---------------
 
-  // Helper: pick black/white depending on brightness
   const getReadableTextColor = (r, g, b) => {
     const luminance = 0.299 * r + 0.587 * g + 0.114 * b;
     return luminance > 186 ? "#000000" : "#FFFFFF";
@@ -80,8 +86,7 @@ export default function BookCarousel({
       g /= totalPixels;
       b /= totalPixels;
 
-      const color = getReadableTextColor(r, g, b);
-      setTextColor(color);
+      setTextColor(getReadableTextColor(r, g, b));
     };
   }, [index, slice, isMobile]);
 
@@ -96,6 +101,7 @@ export default function BookCarousel({
         borderRadius: { xs: 2, md: 3 },
       }}
     >
+      {/* LEFT ARROW */}
       <IconButton
         onClick={handlePrev}
         sx={{
@@ -104,34 +110,47 @@ export default function BookCarousel({
           top: "50%",
           transform: "translateY(-50%)",
           zIndex: 10,
-
           width: { xs: 16, sm: 40, md: 48 },
           height: { xs: 16, sm: 40, md: 48 },
           p: 0,
-
-          bgcolor: {xs: "rgba(255,255,255,0)", md: "rgba(255,255,255,0.25)"},
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-
+          bgcolor: { xs: "rgba(255,255,255,0)", md: "rgba(255,255,255,0.25)" },
           "&:hover": {
-            bgcolor: "rgba(255,255,255,0.8)",
+            bgcolor: {
+              xs: "rgba(255,255,255,0)",
+              md: "#ffb74d",
+            },
           },
         }}
       >
-        <ArrowBackIosNewIcon
-          sx={{
-            fontSize: { xs: 20, sm: 22, md: 28 },
-            color: "orange",
-          }}
-        />
+        <ArrowBackIosNewIcon sx={{ fontSize: {xs:20, md:28}, color: "rgba(255,255,255,1)" }} />
+      </IconButton>
+
+      {/* PLAY / PAUSE BUTTON (CENTER) */}
+      <IconButton
+        onClick={() => setIsPlaying((p) => !p)}
+        sx={{
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          zIndex: 12,
+          width: {xs:34, md:44},
+          height: {xs:34, md:44},
+          bgcolor: "rgba(255,255,255,0.25)",
+          "&:hover": { bgcolor: "rgba(0,0,0,0.6)" },
+        }}
+      >
+        {isPlaying ? (
+          <Pause sx={{ color: "rgba(255,255,255,0.9)" }} />
+        ) : (
+          <PlayArrow sx={{ color: "rgba(255,255,255,0.9)" }} />
+        )}
       </IconButton>
 
       <Box
         sx={{
           display: "flex",
           gap: { xs: 1, sm: 2 },
-          transition: "transform 200ms ease",
         }}
       >
         {slice.map((b, idx) =>
@@ -153,52 +172,29 @@ export default function BookCarousel({
                 alignItems: "flex-end",
               }}
             >
-              <Box
-                sx={{
-                  p: { xs: 1, sm: 1.5 },
-                  width: "100%",
-                  background: `linear-gradient(
-                    45deg,
-                    rgba(45, 60, 80, 0),  
-                    rgba(240, 176, 79, 0), 
-                    rgba(255, 209, 128, 0)
-                  )`,
-                }}
-              >
+              <Box sx={{ p: 1.5 }}>
                 <Typography
                   variant="h5"
-                  gutterBottom={false}
                   sx={{
                     color: textColor,
-                    fontWeight: { xs: 600, md: 800 },
-                    fontSize: { xs: "0.95rem", sm: "1.1rem", md: "1.5rem" },
-                    lineHeight: { xs: 0.75, md: 1.1 },
-                    marginLeft: { xs: 1, md: 1 },
-                    mb: "0 !important",
+                    fontWeight: 800,
+                    mb: 0,
                   }}
                 >
                   {b.title || ""}
                 </Typography>
-                <Typography
-                  variant="body2"
-                  sx={{
-                    color: textColor,
-                    mt: "0 !important",
-                    marginLeft: { xs: 1, md: 1 },
-                  }}
-                >
+                <Typography sx={{ color: textColor }}>
                   {b.subtitle || ""}
                 </Typography>
               </Box>
             </Paper>
           ) : (
-            <Box key={b.id} sx={{ width: "100%" }}>
-              {b.title}
-            </Box>
+            <Box key={b.id}>{b.title}</Box>
           )
         )}
       </Box>
 
+      {/* RIGHT ARROW */}
       <IconButton
         onClick={handleNext}
         sx={{
@@ -207,29 +203,16 @@ export default function BookCarousel({
           top: "50%",
           transform: "translateY(-50%)",
           zIndex: 10,
-
-          // 🔑 Same sizing & centering
           width: { xs: 16, sm: 36, md: 44 },
           height: { xs: 16, sm: 36, md: 44 },
           p: 0,
-
-          bgcolor: {xs: "rgba(255,255,255,0)", md: "rgba(255,255,255,0.4)"},
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-
+          bgcolor: { xs: "rgba(255,255,255,0)", md: "rgba(255,255,255,0.4)" },
           "&:hover": {
-            bgcolor: {xs: "rgba(255,255,255,0)", md: "rgba(255,255,255,1)"},
+            bgcolor: { xs: "rgba(255,255,255,0)", md: "#ffb74d" },
           },
         }}
       >
-        <ArrowForwardIos
-          sx={{
-            fontSize: { xs: 24, sm: 20, md: 28 },
-            color: "orange",
-            mr: "2px", // 🔥 opposite nudge for right arrow
-          }}
-        />
+        <ArrowForwardIos sx={{ fontSize: {xs:20, md:28}, color: "rgba(255,255,255,1)", mr: "2px" }} />
       </IconButton>
     </Box>
   );

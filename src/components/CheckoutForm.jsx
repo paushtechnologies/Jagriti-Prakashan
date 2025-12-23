@@ -95,6 +95,7 @@ export default function CheckoutForm({
   const [payOpen, setPayOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [lastOrder, setLastOrder] = useState(null);
+  const [clearOpen, setClearOpen] = useState(false);
   const [status, setStatus] = useState({
     open: false,
     type: "success",
@@ -503,7 +504,7 @@ ${lastOrder.items.map((i) => `- ${i.title} (x${i.qty})`).join("\n")}
           color="error"
           variant="text"
           size="small"
-          onClick={() => window.confirm("Empty Cart?") && onClearCart()}
+          onClick={() => setClearOpen(true)}
         >
           Clear Cart
         </Button>
@@ -610,6 +611,70 @@ ${lastOrder.items.map((i) => `- ${i.title} (x${i.qty})`).join("\n")}
             onClick={() => setStatus({ ...status, open: false })}
           >
             Close
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={clearOpen}
+        onClose={() => setClearOpen(false)}
+        TransitionComponent={Zoom}
+        PaperProps={{
+          sx: {
+            borderRadius: 4,
+            p: 3,
+            textAlign: "center",
+            background: "#FFF8E1",
+          },
+        }}
+      >
+        <DialogTitle
+          sx={{
+            fontWeight: 900,
+            fontSize: 32,
+            color: "#E65100",
+            fontFamily: '"Playfair Display", serif',
+          }}
+        >
+          Clear Cart?
+        </DialogTitle>
+
+        <DialogContent>
+          <Typography sx={{ fontSize: 16, color: "#5D4037" }}>
+            This will remove all items from your cart.
+            <br />
+            Are you sure you want to continue?
+          </Typography>
+        </DialogContent>
+
+        <DialogActions sx={{ justifyContent: "center", gap: 2, mt: 2 }}>
+          <Button
+            variant="contained"
+            onClick={() => setClearOpen(false)}
+            sx={{
+              borderRadius: 3,
+              px: 4,
+              backgroundColor: "#ffb74d",
+              fontWeight: "bold",
+            }}
+          >
+            Cancel
+          </Button>
+
+          <Button
+            variant="contained"
+            onClick={() => {
+              onClearCart();
+              setClearOpen(false);
+            }}
+            sx={{
+              borderRadius: 3,
+              px: 4,
+              backgroundColor: "#ffb74d",
+              fontWeight: "bold",
+            }}
+          >
+            Yes, Clear
           </Button>
         </DialogActions>
       </Dialog>

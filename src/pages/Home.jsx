@@ -1,180 +1,223 @@
-// src/pages/Home.jsx
-import React, { useRef } from "react";
-import { Typography, Box, Divider, Card, CardContent } from "@mui/material";
+import React, {
+  useRef,
+  useMemo,
+  useState,
+  useEffect,
+  useCallback,
+} from "react";
+import { Typography, Box, Card, CardContent } from "@mui/material";
+import { ArrowForwardIos } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
+
 import BookCarousel from "../components/BookCarousel";
 import BookCard from "../components/BookCard";
-import { ArrowForwardIos } from "@mui/icons-material";
 
 export default function Home({ books = [], addToCart }) {
   const navigate = useNavigate();
 
-  // Banner carousel items
-  const banners = [
-    {
-      banner: "1.png", // desktop
-      bannerMobile: "1-mobile.png", // mobile
-      title: "",
-      subtitle: ""
-    },
-    {
-      banner: "2.png",
-      bannerMobile: "2-mobile.png",
-      title: "",
-      subtitle: ""
-    },
-    {
-      banner: "3.png",
-      bannerMobile: "3-mobile.png",
-      title: "",
-      subtitle: ""
-    },
-    {
-      banner: "4.png",
-      bannerMobile: "4-mobile.png",
-      title: "",
-      subtitle: ""
-    },
-    {
-      banner: "5.jpg",
-      bannerMobile: "5-mobile.jpg",
-      title: "Winter Reads",
-      subtitle: "Books to enjoy this winter"
-    },
-  ];
-
-  const featured = books.slice(0, 8);
-  const categories = [...new Set(books.map((b) => b.category))];
-
-  // Store refs for each category row
+  const pageRef = useRef(null);
   const rowRefs = useRef({});
+  const [overflowing, setOverflowing] = useState({});
 
-  const handleScrollRow = (category) => {
+  /* ---------------- DATA ---------------- */
+
+  const featured = useMemo(() => books.slice(0, 8), [books]);
+
+  const categories = useMemo(() => {
+    const set = new Set();
+    books.forEach((b) => set.add(b.category));
+    return Array.from(set);
+  }, [books]);
+
+  const booksByCategory = useMemo(() => {
+    const map = {};
+    books.forEach((b) => {
+      if (!map[b.category]) map[b.category] = [];
+      map[b.category].push(b);
+    });
+    return map;
+  }, [books]);
+
+  const banners = useMemo(
+    () => [
+      { banner: "1.png", bannerMobile: "1-mobile.png" },
+      { banner: "2.png", bannerMobile: "2-mobile.png" },
+      { banner: "3.png", bannerMobile: "3-mobile.png" },
+      { banner: "4.png", bannerMobile: "4-mobile.png" },
+      { banner: "5.png", bannerMobile: "5-mobile.png" },
+    ],
+    []
+  );
+
+  /* ---------------- OVERFLOW ---------------- */
+
+  const checkOverflow = useCallback((category) => {
     const row = rowRefs.current[category];
-    if (row) {
-      row.scrollBy({ left: 400, behavior: "smooth" });
-    }
-  };
+    if (!row) return;
+
+    setOverflowing((prev) => {
+      const hasOverflow = row.scrollWidth > row.clientWidth + 4;
+      if (prev[category] === hasOverflow) return prev;
+      return { ...prev, [category]: hasOverflow };
+    });
+  }, []);
+
+  const handleScrollRow = useCallback((category) => {
+    rowRefs.current[category]?.scrollBy({
+      left: 420,
+      behavior: "smooth",
+    });
+  }, []);
+
+  /* ---------------- SCROLL REVEAL (SCOPED & FAST) ---------------- */
+
+  useEffect(() => {
+    if (!pageRef.current) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("visible");
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      {
+        threshold: 0.18,
+        rootMargin: "0px 0px -40px 0px",
+      }
+    );
+
+    pageRef.current
+      .querySelectorAll(".reveal")
+      .forEach((el) => observer.observe(el));
+
+    return () => observer.disconnect();
+  }, []);
 
   return (
-    <Box sx={{ px: { xs: 0, sm: 0 }, mt: { xs: 16, sm: 20 }, maxWidth: "1400px", mx: "auto" }}>
-      {/* Banner Carousel */}
-      <Box sx={{ mb: { xs: 2, sm: 4 } }}>
+    <Box
+      ref={pageRef}
+      sx={{
+        mt: { xs: 16, sm: 20 },
+        maxWidth: 1400,
+        mx: "auto",
+      }}
+    >
+      {/* BANNER */}
+      <Box className="reveal" sx={{ mb: { xs: 2, sm: 4 } }}>
         <BookCarousel books={banners} bannerMode />
       </Box>
 
-      {/* Popular books */}
-      <Typography variant="h6" sx={{ mt: { xs: 2, sm: 4 }, mb: { xs: 1, sm: 2 }, color: "primary.main" }}>
-        Popular Books
-      </Typography>
-      <Box sx={{ mb: { xs: 0.5, sm: 1 } }}>
-        <Box
-          sx={{
-            display: "flex",
-            gap: { xs: 1, sm: 2 },
-            overflowX: "auto",
-            scrollBehavior: "smooth",
-            scrollbarWidth: "none",
-            "&::-webkit-scrollbar": { display: "none" },
-            scrollSnapType: "x mandatory",
-            pb: { xs: 0.5, sm: 1 },
-          }}
-        >
-          {featured.slice(0, 5).map((book) => (
-            <Box key={book.id} sx={{ flex: { xs: "0 0 100px", sm: "0 0 180px" }, scrollSnapAlign: "start" }}>
-              <BookCard book={book} onAddToCart={addToCart} />
-            </Box>
-          ))}
+      {/* POPULAR BOOKS */}
+      <Box
+        className="reveal animated-border"
+        sx={{
+          position: "relative",
+          borderRadius: { xs: "14px", sm: "32px" },
+          overflow: "hidden",
+        }}
+      >
+        <Box sx={{ p: { xs: 1.5, sm: 3 } }}>
+          <Typography
+            sx={{
+              mb: { xs: 1, sm: 2 },
+              fontWeight: 600,
+              color: "#56524cff",
+              fontSize: { xs: 16, sm: 28 },
+            }}
+          >
+            Popular Books
+          </Typography>
+
+          <Box
+            className="scroll-row"
+            sx={{ display: "flex", gap: 2, overflowX: "auto" }}
+          >
+            {featured.map((book) => (
+              <Box
+                key={book.id}
+                sx={{ flex: { xs: "0 0 100px", sm: "0 0 150px" } }}
+              >
+                <BookCard book={book} onAddToCart={addToCart} />
+              </Box>
+            ))}
+          </Box>
         </Box>
       </Box>
 
-      {/* All categories preview */}
+      {/* CATEGORIES */}
       <Box sx={{ mt: { xs: 3, sm: 6 } }}>
         {categories.map((category, index) => {
-          const booksInCategory = books.filter((b) => b.category === category);
-          const previewBooks = booksInCategory.slice(0, 4);
-
-          // Apply background only to even categories
-          const bgColor = index % 2 === 0 ? "rgba(13, 27, 42, 0.05)" : "transparent";
+          const list = booksByCategory[category] || [];
 
           return (
-            <Box key={category} sx={{ mb: { xs: 2, sm: 4 }, bgcolor: bgColor, p: { xs: 1, md: 2 }, borderRadius: 1 }}>
-              {/* Category Title */}
-              <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: { xs: 1, sm: 2 } }}>
-                <Typography variant="h5" fontWeight={700}>
-                  {category}
-                </Typography>
-              </Box>
-              {/* Category Row with always-visible More button */}
-              <Box sx={{ display: "flex", gap: { xs: 0, md: 0 } }}>
+            <Box
+              key={category}
+              className="reveal"
+              sx={{
+                mb: { xs: 2, md: 4 },
+                bgcolor:
+                  index % 2 === 0 ? "rgba(13,27,42,0.05)" : "transparent",
+                p: { xs: 1, md: 2 },
+                borderRadius: 1,
+              }}
+            >
+              <Typography
+                fontSize={{ xs: 20, md: 32 }}
+                fontWeight={700}
+                color="#FF9800"
+                mb={1}
+              >
+                {category}
+              </Typography>
+
+              <Box sx={{ display: "flex" }}>
                 <Box
+                  className="scroll-row"
+                  ref={(el) => {
+                    rowRefs.current[category] = el;
+                    el && requestAnimationFrame(() => checkOverflow(category));
+                  }}
                   sx={{
                     display: "flex",
-                    gap: { xs: 1, md: 2 },
+                    gap: { xs: 0, md: 4 },
                     overflowX: "auto",
-                    scrollBehavior: "smooth",
-                    scrollbarWidth: "none",
-                    "&::-webkit-scrollbar": { display: "none" },
-                    scrollSnapType: "x mandatory",
                   }}
-                  ref={el => rowRefs.current[category] = el}
                 >
-                  {booksInCategory.map((book) => (
-                    <Box key={book.id} sx={{ flex: { xs: "0 0 110px", md: "0 0 150px" }, scrollSnapAlign: "start" }}>
+                  {list.map((book) => (
+                    <Box key={book.id} sx={{ flex: "0 0 150px" }}>
                       <BookCard book={book} onAddToCart={addToCart} />
                     </Box>
                   ))}
                 </Box>
-                {/* Minimalist More Card - original style */}
-                <Box sx={{ flex: 1 }}>
+
+                {overflowing[category] && (
                   <Card
                     sx={{
-                      maxWidth: "50px",
-                      marginLeft:"20px",
-                      height: "100%",
+                      ml: 1,
+                      minWidth: { xs: 20, md: 30 },
+                      bgcolor: "#f0b04f",
                       display: "flex",
-                      justifyContent: "center",
                       alignItems: "center",
-                      background: "#f0b04f",
                       cursor: "pointer",
-                      transition: "transform 0.2s, bgcolor 0.2s",
-                      "&:hover": {
-                        transform: "scale(1.05)",
-                        bgcolor: "#FF9800"
-                      }
                     }}
                     onClick={() => handleScrollRow(category)}
                   >
-                    <CardContent
-                      sx={{
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        p: 0
-                      }}
-                    >
-                      <ArrowForwardIos
-                        sx={{
-                          fontSize: { xs: 20, sm: 32 },
-                          writingMode: "vertical-rl",
-                          textOrientation: "mixed",
-                          color: "rgba(255,255,255,1)",
-                        }}
-                      />
+                    <CardContent sx={{ p: 0 }}>
+                      <ArrowForwardIos sx={{ color: "#fff" }} />
                     </CardContent>
                   </Card>
-                </Box>
+                )}
               </Box>
-
-              {/* <Divider sx={{ mt: 4 }} /> */}
             </Box>
           );
         })}
       </Box>
 
-      {/* Gallery CTA */}
-      <Box sx={{ mt: { xs: 3, sm: 6 }, textAlign: "center" }}>
+      {/* CTA */}
+      <Box className="reveal" sx={{ mt: 6, textAlign: "center" }}>
         <Typography variant="h6">Want to see all books?</Typography>
         <Box
           component="button"
@@ -187,14 +230,106 @@ export default function Home({ books = [], addToCart }) {
             color: "#fff",
             border: "none",
             borderRadius: 1,
-            cursor: "pointer",
             fontWeight: 700,
-            "&:hover": { bgcolor: "primary.dark" },
+            cursor: "pointer",
           }}
         >
           Open Gallery
         </Box>
       </Box>
+
+      {/* CSS */}
+      <style>
+  {`
+    /* Reveal animation */
+          .reveal {
+            opacity: 0;
+            transform: translateY(28px) scale(0.98);
+            transition:
+              opacity 700ms cubic-bezier(.2,.6,.2,1),
+              transform 700ms cubic-bezier(.2,.6,.2,1);
+            will-change: transform, opacity;
+          }
+
+          .reveal.visible {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
+
+          /* Smooth continuous animated border */
+          .animated-border::before {
+            content: "";
+            position: absolute;
+            inset: -2px;
+            border-radius: inherit;
+            background: conic-gradient(
+              from 0deg,
+              transparent 0deg,
+              #f1950aff 90deg,
+              transparent 180deg,
+              #f0b04f 270deg,
+              transparent 360deg
+            );
+            animation: rotateBorder 22s linear infinite;
+            z-index: 0;
+          }
+
+          .animated-border::after {
+            content: "";
+            position: absolute;
+            inset: 3px;
+            background: linear-gradient(
+  90deg,
+  #f8c978 0%,
+  #fde9c3 30%,
+  #fdf6e6 60%,
+  #edc27dff 100%
+);
+
+            border-radius: inherit;
+            z-index: 1;
+          }
+
+          .animated-border > * {
+            position: relative;
+            z-index: 2;
+          }
+
+          @keyframes rotateBorder {
+            to { transform: rotate(360deg); }
+          }
+
+    /* ✅ FIXED MINIMAL SCROLLBAR */
+    // .scroll-row {
+    //   overflow-x: auto;
+    //   overflow-y: hidden;
+    //   scrollbar-width: thin;
+    //   scrollbar-color: rgba(0,0,0,0.35) transparent;
+    //   -webkit-overflow-scrolling: touch;
+    // }
+
+    /* 🔑 THIS WAS MISSING */
+    .scroll-row::-webkit-scrollbar {
+      height: 5px;
+    }
+
+    .scroll-row::-webkit-scrollbar-thumb {
+      background-color: rgba(0,0,0,0.35);
+      border-radius: 10px;
+    }
+
+    @media (max-width: 768px) {
+      .scroll-row::-webkit-scrollbar {
+        height: 3px;
+      }
+
+      .scroll-row::-webkit-scrollbar-thumb {
+        background-color: rgba(0,0,0,0.15);
+      }
+    }
+  `}
+</style>
+
     </Box>
   );
 }

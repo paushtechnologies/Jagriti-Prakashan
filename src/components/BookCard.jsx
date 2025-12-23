@@ -32,10 +32,10 @@ export default function BookCard({ book, onAddToCart }) {
         image={displayImage}
         alt={book.title}
         sx={{ 
-          height: { xs: 150, sm: 200 }, 
+          height: { xs: 150, sm: 240 }, 
           objectFit: "contain", 
           bgcolor: "#fafafa",
-          p: 1 // Optional: adds a little padding around the book cover
+          p:0 // Optional: adds a little padding around the book cover
         }}
       />
       
@@ -55,7 +55,7 @@ export default function BookCard({ book, onAddToCart }) {
           sx={{ 
             display: "block", 
             mt: {xs: 0, sm: 0.3}, 
-            fontSize: "0.65rem", 
+            fontSize: { xs: "0.65rem", sm: "0.75rem" }, 
             color: "text.secondary" 
           }}
         >
@@ -65,7 +65,7 @@ export default function BookCard({ book, onAddToCart }) {
         <Typography 
           sx={{ 
             mt: { xs: 0.1, sm: 0.3 }, 
-            fontSize: { xs: "0.78rem", sm: "1rem" }, 
+            fontSize: { xs: "0.85rem", sm: "1.25rem" }, 
             fontWeight: 700,
             color: "primary.main"
           }}
@@ -74,8 +74,8 @@ export default function BookCard({ book, onAddToCart }) {
         </Typography>
       </CardContent>
 
-      <CardActions sx={{ p: { xs: 0.5, sm: 1 }, mt: "auto" }}>
-        <Stack direction="row" spacing={0.5} sx={{ width: "100%", justifyContent: "space-between" }}>
+      <CardActions sx={{ p: { xs: 0.5, sm: 0.5 } }}>
+        <Stack direction="row" spacing={0.4} sx={{ width: "100%", justifyContent: "space-between" }}>
           <Button
             size="small"
             component={Link}
@@ -86,7 +86,7 @@ export default function BookCard({ book, onAddToCart }) {
               borderColor: "#f0b04f",
               minWidth: { xs: 0, sm: 60 },
               px: { xs: 1, sm: 1.5 },
-              fontSize: { xs: "0.65rem", sm: "0.75rem" },
+              fontSize: { xs: "0.75rem", sm: "1.1rem" },
               textTransform: "none"
             }}
           >
@@ -104,8 +104,8 @@ export default function BookCard({ book, onAddToCart }) {
               backgroundColor: "#f0b04f",
               color: "#fff",
               minWidth: { xs: 0, sm: 60 },
-              px: { xs: 1, sm: 1.5 },
-              fontSize: { xs: "0.65rem", sm: "0.75rem" },
+              px: { xs: 1, sm: 2 },
+              fontSize: { xs: "0.75rem", sm: "1.15rem" },
               textTransform: "none",
               "&:hover": { backgroundColor: "#d99a3d" }
             }}
