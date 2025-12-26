@@ -98,7 +98,7 @@ export default function Gallery({ books = [], addToCart, loading = false }) {
                   alt={book.title}
                   loading={index < 21 ? "eager" : "lazy"}
                   decoding="async"
-                  fetchpriority={index < 21 ? "high" : "auto"}
+                  fetchPriority={index < 21 ? "high" : "auto"}
                   sx={{
                     height: { xs: 150, sm: 200, md: 230 },
                     objectFit: "cover", // 👈 Zoom and fill width

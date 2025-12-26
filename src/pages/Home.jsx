@@ -116,7 +116,7 @@ export default function Home({ books = [], addToCart, loading = false }) {
     <Box
       ref={pageRef}
       sx={{
-        mt: { xs: 2, sm: 8 },
+        mt: { xs: 1, sm: 8 },
         maxWidth: 1400,
         mx: "auto",
       }}
@@ -145,13 +145,13 @@ export default function Home({ books = [], addToCart, loading = false }) {
         <Box sx={{ p: { xs: 1.5, sm: 3 } }}>
           <Typography
             sx={{
-              mb: { xs: 1, sm: 2 },
+              mb: { xs: 0, sm: 0 },
               fontWeight: 600,
               color: "#56524cff",
               fontSize: { xs: 16, sm: 28 },
             }}
           >
-            Bestsellers
+            Featured
           </Typography>
 
           {loading && books.length === 0 ? (
@@ -263,15 +263,15 @@ export default function Home({ books = [], addToCart, loading = false }) {
       </Box>
 
       {/* CTA */}
-      <Box className="reveal" sx={{ mt: 6, textAlign: "center" }}>
+      <Box className="reveal" sx={{ mt: {xs: 2, md: 4}, textAlign: "center" }}>
         <Typography variant="h6">Want to see all books?</Typography>
         <Box
           component="button"
           onClick={() => navigate("/gallery")}
           sx={{
-            mt: 2,
-            px: 4,
-            py: 1.5,
+            mt: {xs: 1,md: 2},
+            px: {xs: 2, md: 4},
+            py: {xs: 1.25, md: 1.5},
             bgcolor: "primary.main",
             color: "#fff",
             border: "none",

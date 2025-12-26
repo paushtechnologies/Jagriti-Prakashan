@@ -1,12 +1,29 @@
 // src/components/CartTable.jsx
 import React from "react";
 import {
-  Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
-  Paper, IconButton, Typography, Box, Button, Card, CardContent, Divider, useTheme, useMediaQuery, InputBase
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  IconButton,
+  Typography,
+  Box,
+  Button,
+  Card,
+  CardContent,
+  Divider,
+  useTheme,
+  useMediaQuery,
+  InputBase,
 } from "@mui/material";
-import { Delete, Add, Remove } from "@mui/icons-material";
+import { Delete, Add, Remove, Search as SearchIcon, Close as CloseIcon  } from "@mui/icons-material";
+import { matchesBook } from "../utils/bookSearch";
 
-// Helper for manual input
+/* ===================== Editable Quantity ===================== */
+
 const EditableQty = ({ value, onChange, width = 32 }) => {
   const [tempValue, setTempValue] = React.useState(value);
 
@@ -14,38 +31,16 @@ const EditableQty = ({ value, onChange, width = 32 }) => {
 
   const handleChange = (e) => {
     const val = e.target.value;
-
-    // Only allow empty string or valid numbers
-    if (val === '' || /^[0-9]+$/.test(val)) {
+    if (val === "" || /^[0-9]+$/.test(val)) {
       setTempValue(val);
-
-      // Update immediately if it's a valid number
-      if (val !== '') {
-        const num = parseInt(val, 10);
-        if (!isNaN(num)) {
-          onChange(num);
-        }
-      } else {
-        // Empty input = 0
-        onChange(0);
-      }
+      onChange(val === "" ? 0 : parseInt(val, 10));
     }
   };
 
   const handleBlur = () => {
-    // On blur, ensure we have a valid number
-    let num = parseInt(tempValue, 10);
-
-    if (tempValue === "" || isNaN(num)) {
-      num = 0;
-    }
-
-    // Sync with parent if needed
-    if (num !== value) {
-      onChange(num);
-    }
-    // Update display to match actual value
-    setTempValue(num);
+    const num = parseInt(tempValue, 10);
+    onChange(isNaN(num) ? 0 : num);
+    setTempValue(isNaN(num) ? 0 : num);
   };
 
   return (
@@ -53,92 +48,220 @@ const EditableQty = ({ value, onChange, width = 32 }) => {
       value={tempValue}
       onChange={handleChange}
       onBlur={handleBlur}
-      onKeyDown={(e) => e.key === 'Enter' && e.target.blur()}
+      onKeyDown={(e) => e.key === "Enter" && e.target.blur()}
       sx={{
-        width: width,
+        width,
         mx: 0.5,
-        border: '1px solid rgba(0,0,0,0.1)',
-        borderRadius: '4px',
-        bgcolor: 'rgba(255,255,255,0.5)',
-        '&:focus-within': {
-          borderColor: '#f0b04f',
-          bgcolor: '#fff',
-          boxShadow: '0 0 0 2px rgba(240, 176, 79, 0.2)'
+        border: "1px solid rgba(0,0,0,0.15)",
+        borderRadius: 1,
+        bgcolor: "#fff",
+        input: {
+          textAlign: "center",
+          fontWeight: 600,
+          p: 0.5,
+          fontSize: "0.9rem",
         },
-        input: { textAlign: 'center', fontWeight: 600, p: 0.5, fontSize: '0.9rem' }
       }}
     />
   );
 };
 
+/* ===================== CartTable ===================== */
+
 export default function CartTable({ items = [], onUpdateQty, onRemove }) {
-  const grandTotal = items.reduce((s, it) => s + (it.price * it.qty), 0);
   const theme = useTheme();
-  const isXs = useMediaQuery(theme.breakpoints.down('sm'));
+  const isXs = useMediaQuery(theme.breakpoints.down("sm"));
+
+  const [query, setQuery] = React.useState("");
+
+  /* 🔍 SAME SEARCH LOGIC AS HEADER */
+  const filteredItems = React.useMemo(() => {
+    if (!query.trim()) return items;
+    return items.filter((item) => matchesBook(item, query));
+  }, [items, query]);
+
+  const grandTotal = filteredItems.reduce((s, it) => s + it.price * it.qty, 0);
+
+  /* ===================== Search Bar ===================== */
+
+  const SearchBar = (
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        gap: 1,
+        px: { xs: 0.5, sm: 1 },
+        py: { xs: 0, sm: 0.2},
+        mb: 1.2,
+        width: "100%",
+        maxWidth: { xs: "100%", sm: 380 },
+
+        /* GOLD GLASS */
+        background:
+          "linear-gradient(135deg, rgba(255,248,235,0.98), rgba(240,176,79,0.18))",
+        borderRadius: "999px",
+        border: "1.5px solid rgba(240,176,79,0.6)",
+
+        transition: "border-color 0.2s ease, background 0.2s ease",
+
+        "&:focus-within": {
+          background: "#fff",
+          borderColor: "#f0b04f",
+        },
+      }}
+    >
+      {/* SEARCH ICON */}
+      <SearchIcon
+        sx={{
+          color: "#f0b04f",
+          fontSize: 22,
+          ml: 0.5,
+        }}
+      />
+
+      {/* INPUT */}
+      <InputBase
+        placeholder="Search book, author, publisher…"
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        sx={{
+          flex: 1,
+          fontSize: "0.95rem",
+          fontWeight: 500,
+          color: "#0d1b2a",
+
+          "& input::placeholder": {
+            color: "rgba(13,27,42,0.5)",
+            fontWeight: 400,
+          },
+        }}
+      />
+
+      {/* CLEAR BUTTON */}
+      {query && (
+        <IconButton
+          size="small"
+          onClick={() => setQuery("")}
+          sx={{
+            color: "#f0b04f",
+            "&:hover": {
+              bgcolor: "rgba(240,176,79,0.12)",
+            },
+          }}
+        >
+          <CloseIcon fontSize="small" />
+        </IconButton>
+      )}
+    </Box>
+  );
+
+  /* ===================== MOBILE VIEW ===================== */
 
   if (isXs) {
-    // Mobile stacked view (tighter paddings)
     return (
       <Box>
-        <Typography variant="h6" sx={{ mb: 0.5, fontWeight: 700, color: "rgba(13, 27, 42, 0.85)", fontSize: '0.98rem' }}>
+        <Typography
+          variant="h6"
+          sx={{ mb: 0.5, fontWeight: 700, fontSize: "0.95rem" }}
+        >
           📚 Books Order
         </Typography>
-        <Typography color="error" sx={{ mb: 0.75, fontSize: '0.88rem' }}>Shipping extra</Typography>
 
-        {items.map((row) => (
-          <Card key={row.id} sx={{ mb: 1.5, p: 1, boxShadow: 1, backgroundColor: '#FDF7EC', borderRadius: 2 }}>
+        <Typography color="error" sx={{ mb: 0.65, fontSize: "0.85rem" }}>
+          Shipping will be extra
+        </Typography>
+
+        {SearchBar}
+
+        {filteredItems.map((row) => (
+          <Card
+            key={row.id}
+            sx={{
+              mt: 1.5,
+              p: 1,
+              boxShadow: 1,
+              backgroundColor: "#FDF7EC",
+              borderRadius: 2,
+            }}
+          >
             <CardContent sx={{ p: 1 }}>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
-                <Typography sx={{ fontWeight: 700, fontSize: '0.95rem', color: '#0d1b2a' }}>{row.title}</Typography>
-                <IconButton size="small" onClick={() => onRemove(row.id)} aria-label="remove" sx={{ color: 'text.secondary' }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  mb: 1,
+                }}
+              >
+                <Typography sx={{ fontWeight: 600, fontSize: "0.9rem" }}>
+                  {row.title}
+                </Typography>
+                <IconButton size="small" onClick={() => onRemove(row.id)}>
                   <Delete fontSize="small" />
                 </IconButton>
               </Box>
 
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Typography sx={{ fontWeight: 500, color: 'text.secondary', fontSize: '0.9rem', minWidth: '70px' }}>
-                  ₹ {Number(row.price).toFixed(2)}
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+              >
+                <Typography sx={{ fontSize: "0.85rem" }}>
+                  ₹ {row.price.toFixed(2)}
                 </Typography>
 
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                <Box sx={{ display: "flex", alignItems: "center" }}>
                   <IconButton
                     size="small"
+                    onClick={() =>
+                      onUpdateQty(row.id, Math.max(0, row.qty - 1))
+                    }
                     sx={{
-                      bgcolor: '#f0b04f',
-                      color: '#fff',
-                      boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
-                      width: 26,
-                      height: 26,
-                      '&:hover': { bgcolor: '#e6a03d' }
+                      width: { xs: 26, sm: 32 },
+                      height: { xs: 26, sm: 32 },
+                      bgcolor: "#f0b04f",
+                      color: "rgb(0,0.0,0.25)",
+                      fontWeight: 700,
+                      boxShadow: "0 2px 6px rgba(0,0,0,0.25)",
+                      "&:hover": {
+                        bgcolor: "#e6a03d",
+                        transform: "scale(1.08)",
+                      },
+                      transition: "all 0.2s ease",
                     }}
-                    onClick={() => onUpdateQty(row.id, Math.max(0, row.qty - 1))}
                   >
-                    <Remove fontSize="small" sx={{ fontSize: '0.8rem' }} />
+                    <Remove fontSize="small" />
                   </IconButton>
 
                   <EditableQty
                     value={row.qty}
                     onChange={(val) => onUpdateQty(row.id, val)}
-                    width={32}
                   />
 
                   <IconButton
                     size="small"
-                    sx={{
-                      bgcolor: '#f0b04f',
-                      color: '#fff',
-                      boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
-                      width: 26,
-                      height: 26,
-                      '&:hover': { bgcolor: '#e6a03d' }
-                    }}
                     onClick={() => onUpdateQty(row.id, row.qty + 1)}
+                    sx={{
+                      width: { xs: 26, sm: 32 },
+                      height: { xs: 26, sm: 32 },
+                      bgcolor: "#f0b04f",
+                      color: "rgba(0,0,0,1)",
+                      fontWeight: 700,
+                      boxShadow: "0 2px 6px rgba(0,0,0,0.25)",
+                      "&:hover": {
+                        bgcolor: "#e6a03d",
+                        transform: "scale(1.08)",
+                      },
+                      transition: "all 0.2s ease",
+                    }}
                   >
-                    <Add fontSize="small" sx={{ fontSize: '0.8rem' }} />
+                    <Add fontSize="small" />
                   </IconButton>
                 </Box>
 
-                <Typography sx={{ fontWeight: 700, fontSize: '1rem', color: '#0d1b2a', minWidth: '90px', textAlign: 'right' }}>
+                <Typography sx={{ fontWeight: 700 }}>
                   ₹ {(row.price * row.qty).toFixed(2)}
                 </Typography>
               </Box>
@@ -146,72 +269,143 @@ export default function CartTable({ items = [], onUpdateQty, onRemove }) {
           </Card>
         ))}
 
-        <Divider sx={{ my: 0.5 }} />
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', py: 0.25 }}>
-          <Typography sx={{ fontWeight: 700, fontSize: '0.95rem' }}>Total</Typography>
-          <Typography sx={{ fontWeight: 700, fontSize: '0.95rem' }}>₹ {grandTotal.toFixed(2)}</Typography>
+        <Divider sx={{ my: 1 }} />
+        <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+          <Typography fontWeight={700}>Total</Typography>
+          <Typography fontWeight={700}>₹ {grandTotal.toFixed(2)}</Typography>
         </Box>
       </Box>
     );
   }
 
-  // Desktop/table view (unchanged)
+  /* ===================== DESKTOP VIEW ===================== */
+
   return (
     <Box>
-      <Typography variant="h6" sx={{ mb: 1, fontWeight: 700, color: "rgba(13, 27, 42, 0.75)" }}>
-        📚 Books Order Form
-      </Typography>
-      <Typography color="error" sx={{ mb: 2 }}>Shipping will be extra.</Typography>
+      {/* HEADER ROW WITH SEARCH */}
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 1.5,
+          gap: 2,
+        }}
+      >
+        <Box>
+          <Typography
+            variant="h6"
+            sx={{ fontWeight: 700, color: "rgba(13,27,42,0.75)" }}
+          >
+            📚 Books Order Form
+          </Typography>
+          <Typography color="error" sx={{ fontSize: "0.9rem" }}>
+            Shipping will be extra
+          </Typography>
+        </Box>
 
-      <TableContainer component={Paper} elevation={3} sx={{ backgroundColor: '#FDF7EC' }}>
+        {SearchBar}
+      </Box>
+
+      <TableContainer
+        component={Paper}
+        elevation={3}
+        sx={{ backgroundColor: "#FDF7EC" }}
+      >
         <Table size="small">
           <TableHead>
             <TableRow sx={{ backgroundColor: "#FFC107" }}>
-              <TableCell sx={{ color: "#fff", fontWeight: 700, py: 0.6, px: 1, width: "40%" }}>Book Title</TableCell>
-              <TableCell align="right" sx={{ color: "#fff", fontWeight: 700, py: 0.6, px: 1, width: "15%", minWidth: 100 }}>Price (₹)</TableCell>
-              <TableCell align="center" sx={{ color: "#fff", fontWeight: 700, py: 0.6, px: 1, width: "20%" }}>Quantity</TableCell>
-              <TableCell align="right" sx={{ color: "#fff", fontWeight: 700, py: 0.6, px: 1, width: "15%", minWidth: 120 }}>Total (₹)</TableCell>
-              <TableCell align="center" sx={{ color: "#fff", fontWeight: 700, py: 0.6, px: 1, width: "10%" }}>Remove</TableCell>
+              <TableCell sx={{ color: "#1b1818ff", fontWeight: 700 }}>
+                Book Title
+              </TableCell>
+              <TableCell
+                align="center"
+                sx={{ color: "#141313ff", fontWeight: 700 }}
+              >
+                Price (₹)
+              </TableCell>
+              <TableCell
+                align="center"
+                sx={{ color: "#181616ff", fontWeight: 700 }}
+              >
+                Quantity
+              </TableCell>
+              <TableCell
+                align="right"
+                sx={{ color: "#181616ff", fontWeight: 700 }}
+              >
+                Total (₹)
+              </TableCell>
+              <TableCell
+                align="center"
+                sx={{ color: "#171313ff", fontWeight: 700 }}
+              >
+                Remove
+              </TableCell>
             </TableRow>
           </TableHead>
 
           <TableBody>
-            {items.map((row) => (
+            {filteredItems.map((row) => (
               <TableRow key={row.id}>
-                <TableCell sx={{ maxWidth: 380, py: 0.5, px: 1 }}>{row.title}</TableCell>
-                <TableCell align="right" sx={{ py: 0.5, px: 1 }}>₹ {Number(row.price).toFixed(2)}</TableCell>
-                <TableCell align="center" sx={{ py: 0.5, px: 1 }}>
-                  <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 0.5 }}>
-                    <Button
-                      size="medium"
-                      variant="contained"
-                      sx={{ minWidth: 36, minHeight: 36, p: 0, backgroundColor: "#f0b04f", color: "#fff", "&:hover": { backgroundColor: "#FF9800" } }}
-                      onClick={() => onUpdateQty(row.id, Math.max(0, row.qty - 1))}
+                <TableCell sx={{ fontSize: 16, fontWeight: 400 }}>
+                  {row.title}
+                </TableCell>
+                <TableCell align="center" sx={{ fontSize: 16, fontWeight: 400 }}>₹ {row.price.toFixed(0)}</TableCell>
+                <TableCell align="center">
+                  <Box sx={{ display: "flex", justifyContent: "center" }}>
+                    <IconButton
+                      size="small"
+                      onClick={() =>
+                        onUpdateQty(row.id, Math.max(0, row.qty - 1))
+                      }
+                      sx={{
+                        width: { xs: 26, sm: 32 },
+                        height: { xs: 26, sm: 32 },
+                        bgcolor: "#f0b04f",
+                        color: "rgb(0,0,0,1)",
+                        fontWeight: 700,
+                        boxShadow: "0 2px 6px rgba(0,0,0,1)",
+                        "&:hover": {
+                          bgcolor: "#e6a03d",
+                          transform: "scale(1.08)",
+                        },
+                        transition: "all 0.2s ease",
+                      }}
                     >
-                      <Remove />
-                    </Button>
-
+                      <Remove fontSize="small" />
+                    </IconButton>
                     <EditableQty
                       value={row.qty}
                       onChange={(val) => onUpdateQty(row.id, val)}
                       width={45}
                     />
-
-                    <Button
-                      size="medium"
-                      variant="contained"
-                      sx={{ minWidth: 36, minHeight: 36, p: 0, backgroundColor: "#f0b04f", color: "#fff", "&:hover": { backgroundColor: "#FF9800" } }}
+                    <IconButton
+                      size="small"
                       onClick={() => onUpdateQty(row.id, row.qty + 1)}
+                      sx={{
+                        width: { xs: 26, sm: 32 },
+                        height: { xs: 26, sm: 32 },
+                        bgcolor: "#f0b04f",
+                        color: "rgb(0,0,0,1)",
+                        fontWeight: 700,
+                        boxShadow: "0 2px 6px rgba(0,0,0,0,1)",
+                        "&:hover": {
+                          bgcolor: "#e6a03d",
+                          transform: "scale(1.08)",
+                        },
+                        transition: "all 0.2s ease",
+                      }}
                     >
-                      <Add />
-                    </Button>
+                      <Add fontSize="small" />
+                    </IconButton>
                   </Box>
                 </TableCell>
-
-                <TableCell align="right" sx={{ py: 0.5, px: 1, minWidth: 120 }}>₹ {(row.price * row.qty).toFixed(2)}</TableCell>
-
-                <TableCell align="center" sx={{ py: 0.5, px: 1 }}>
-                  <IconButton onClick={() => onRemove(row.id)} aria-label="remove">
+                <TableCell align="right" sx={{ fontSize: 16, fontWeight: 400 }}>
+                  ₹ {(row.price * row.qty).toFixed(2)}
+                </TableCell>
+                <TableCell align="center">
+                  <IconButton onClick={() => onRemove(row.id)}>
                     <Delete />
                   </IconButton>
                 </TableCell>
@@ -219,11 +413,13 @@ export default function CartTable({ items = [], onUpdateQty, onRemove }) {
             ))}
 
             <TableRow>
-              <TableCell colSpan={3} align="right" sx={{ py: 0.6, px: 1 }}>
-                <Typography sx={{ fontWeight: 700 }}>Total Amount (₹)</Typography>
+              <TableCell colSpan={3} align="right">
+                <Typography fontWeight={700}>Total Amount (₹)</Typography>
               </TableCell>
-              <TableCell align="right" sx={{ py: 0.6, px: 1, minWidth: 120 }}>
-                <Typography sx={{ fontWeight: 700 }}>₹ {grandTotal.toFixed(2)}</Typography>
+              <TableCell align="right">
+                <Typography fontWeight={700}>
+                  ₹ {grandTotal.toFixed(2)}
+                </Typography>
               </TableCell>
               <TableCell />
             </TableRow>

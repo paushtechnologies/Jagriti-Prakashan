@@ -8,6 +8,7 @@ import {
   ThemeProvider,
   Box,
 } from "@mui/material";
+import FooterWave from "./components/FooterWave";
 import { getAssetPath } from "./utils/assetPath";
 import { loadCart, saveCart, subscribeCartChanges } from "./utils/cartStorage";
 import Home from "./pages/Home";
@@ -309,10 +310,11 @@ function App() {
       </div>
 
 
-
+      
       {/* NEW: App-like Bottom Navigation */}
       <MobileBottomNav cartCount={cartCount} />
 
+      <FooterWave />
       <Footer
         siteTitle={SITE.title}
         contactEmail={SITE.contactEmail}

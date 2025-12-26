@@ -10,7 +10,7 @@ import {
   Box,
   Dialog,
   DialogContent,
-  IconButton
+  IconButton,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { Link } from "react-router-dom";
@@ -45,6 +45,7 @@ export default function BookCard({ book, onAddToCart, loading = false }) {
         display: "flex",
         flexDirection: "column",
         borderRadius: { xs: 1, md: 2 },
+        padding: { xs: 0, md: 0 },
         overflow: "hidden",
         transition: "all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)", // Smooth physics
         transformStyle: "preserve-3d", // Enable 3D
@@ -78,21 +79,30 @@ export default function BookCard({ book, onAddToCart, loading = false }) {
               display: "block",
               cursor: "zoom-in",
               transition: "transform 0.4s",
-              "&:hover": { transform: "scale(1.1)" }
+              "&:hover": { transform: "scale(1.1)" },
             }}
           />
         )}
       </Box>
 
       {/* ================= CONTENT ================= */}
-      <CardContent sx={{ flexGrow: 1, p: 1, overflow: "hidden" }}>
+      <CardContent
+        sx={{
+          flexGrow: 1,
+          px: { xs: 0.5, md: 1 },
+          py: { xs: 0.2, md: 0.5 },
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between", // 🔑 keeps price at bottom
+        }}
+      >
         {/* Title */}
         {book?.title ? (
           <Typography
             sx={{
               fontSize: { xs: "0.8rem", sm: "1rem" },
               fontWeight: 700,
-              lineHeight: 1.2,
+              lineHeight: 1.6,
               display: "-webkit-box",
               WebkitLineClamp: 2,
               WebkitBoxOrient: "vertical",
@@ -119,10 +129,7 @@ export default function BookCard({ book, onAddToCart, loading = false }) {
             {book.author}
           </Typography>
         ) : (
-          <Skeleton
-            variant="text"
-            sx={{ fontSize: "0.7rem", width: "70%" }}
-          />
+          <Skeleton variant="text" sx={{ fontSize: "0.7rem", width: "70%" }} />
         )}
 
         {/* Price */}
@@ -146,7 +153,7 @@ export default function BookCard({ book, onAddToCart, loading = false }) {
       </CardContent>
 
       {/* ================= ACTIONS ================= */}
-      <CardActions sx={{ p: 1 }}>
+      <CardActions sx={{ px: { xs: 1, md: 1 }, pt: { xs: 0, md: 1 } }}>
         {!hasBook || loading ? (
           <Stack
             direction={{ xs: "column", sm: "row" }}
@@ -181,10 +188,12 @@ export default function BookCard({ book, onAddToCart, loading = false }) {
               sx={{
                 borderColor: "#f0b04f",
                 color: "#f0b04f",
+                px: { xs: 0, sm: 1.8 },
+                py: { xs: 0, sm: 0.6 },
                 backgroundColor: "transparent",
                 textTransform: "none",
                 fontWeight: 600,
-                fontSize: { xs: "0.7rem", sm: "0.85rem" },
+                fontSize: { xs: "0.85rem", sm: "1rem" },
                 boxShadow: "0 2px 4px rgba(240, 176, 79, 0.1)",
                 transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
                 "&:hover": {
@@ -212,14 +221,18 @@ export default function BookCard({ book, onAddToCart, loading = false }) {
                 color: "#fff",
                 textTransform: "none",
                 fontWeight: 700,
-                fontSize: { xs: "0.7rem", sm: "0.85rem" },
+                px: { xs: 0, sm: 1.8 },
+                py: { xs: 0, sm: 0.6 },
+                fontSize: { xs: "0.85rem", sm: "1rem" },
                 border: "none",
-                boxShadow: "0 4px 12px rgba(240, 176, 79, 0.3)",
+                boxShadow: "0 4px 12px rgba(214, 185, 141, 0.3)",
                 transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
                 "&:hover": {
-                  background: "linear-gradient(135deg, #ffc870 0%, #f0b04f 100%)",
+                  background:
+                    "linear-gradient(135deg, #ffc870 0%, #f0b04f 100%)",
                   boxShadow: "0 6px 20px rgba(240, 176, 79, 0.4)",
                   transform: "translateY(-2px)",
+                  color: "#1A1A1A",
                 },
               }}
             >
@@ -237,7 +250,7 @@ export default function BookCard({ book, onAddToCart, loading = false }) {
             bgcolor: "#000",
             display: "flex",
             justifyContent: "center",
-            overflow: "hidden"
+            overflow: "hidden",
           }}
         >
           <IconButton

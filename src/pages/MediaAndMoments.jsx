@@ -34,7 +34,7 @@ const allPhotos = Array.from({ length: 60 }, (_, i) => {
     id: i,
     url: getAssetPath(`assets/media/${imageNumber}.${extension}`),
     title: `Moment ${imageNumber}`,
-    date: "2024 Events"
+    // date: "2024 Events"
   };
 });
 
@@ -129,10 +129,11 @@ export default function MediaAndMoments() {
   return (
     <Box
       sx={{
-        mt: { xs: 2, sm: 6 },
+        mt: { xs: 1, sm: 6 },
         mb: { xs: 8, sm: 12 },
         px: { xs: 2, sm: 4, md: 8 },
-        overflowX: "hidden"
+        overflowX: "hidden",
+        overflowY: "hidden"
       }}
     >
       {/* 🏛️ THE GALLERY WALL (INFINITE MARQUEE) */}
@@ -142,18 +143,18 @@ export default function MediaAndMoments() {
           sx={{
             fontWeight: 900,
             fontFamily: '"Montserrat", sans-serif',
-            background: "linear-gradient(135deg, #f0b04f 0%, #ffc870 50%, #d99a3d 100%)",
+            background: "linear-gradient(135deg, #f0b04f 0%, #9a5a1bff 50%, #d99a3d 100%)",
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
-            mb: 1,
-            fontSize: { xs: "2.5rem", md: "4rem" },
+            // mb: 1,
+            fontSize: { xs: "2rem", md: "3rem" },
             letterSpacing: "8px",
             textTransform: "uppercase"
           }}
         >
           Our moments
         </Typography>
-        <Box sx={{ width: "120px", height: "5px", background: "#f0b04f", mx: "auto", borderRadius: "10px", mb: 4 }} />
+        <Box sx={{ width: "120px", height: "5px", background: "#a08d70ff", mx: "auto", borderRadius: "10px", mb: 4 }} />
 
         {/* EDGE-TO-EDGE MARQUEE CONTAINER */}
         <Box sx={{
@@ -163,7 +164,7 @@ export default function MediaAndMoments() {
           right: "50%",
           marginLeft: "-50vw",
           marginRight: "-50vw",
-          overflow: "hidden"
+
         }}>
           {/* Top Track */}
           <Box sx={{ whiteSpace: "nowrap", mb: 1.5 }}>

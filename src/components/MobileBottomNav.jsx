@@ -28,7 +28,7 @@ export default function MobileBottomNav({ cartCount = 0 }) {
                 width: "100vw", // 👈 Ensure full viewport width
                 display: { xs: 'block', sm: 'none' }, // Mobile only
                 zIndex: 1300,
-                background: "linear-gradient(90deg, rgba(13,27,42,0.9) 0%, rgba(13,27,42,0.7) 20%, #c89e5eff 50%, rgba(13,27,42,0.6) 80%, rgba(13,27,42,0.8) 100%)",
+                background: "linear-gradient(90deg, rgba(13,27,42,1) 0%, rgba(13,27,42,0.7) 20%, #2b2926ff 50%, rgba(13,27,42,0.7) 80%, rgba(13,27,42,0.8) 100%)",
                 borderTop: "1px solid rgba(255,255,255,0.1)",
                 borderRadius: 0,
                 m: 0,

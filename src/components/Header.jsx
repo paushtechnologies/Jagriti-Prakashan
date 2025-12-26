@@ -27,50 +27,49 @@ import {
 } from "@mui/icons-material";
 import { useNavigate, useLocation } from "react-router-dom";
 import { getAssetPath } from "../utils/assetPath";
+import { matchesBook } from "../utils/bookSearch";
 
-export default function Header({ cartCount = 0, onCart, onToggleMode, mode, books = [] }) {
+
+/* ===================== COMPONENT ===================== */
+
+export default function Header({ cartCount = 0, onCart, books = [] }) {
   const [query, setQuery] = useState("");
   const [showSearch, setShowSearch] = useState(false);
   const [showDesktopResults, setShowDesktopResults] = useState(false); // 👈 Control desktop results
   const [menuAnchor, setMenuAnchor] = useState(null); // mobile hamburger menu
   const navigate = useNavigate();
-  const location = useLocation();
 
-  // Instant Search Logic
+  /* ===================== FILTERED RESULTS ===================== */
+
   const filteredBooks = useMemo(() => {
-    if (!query.trim()) return [];
-    const q = query.toLowerCase();
-    return books.filter(
-      (b) =>
-        b.title.toLowerCase().includes(q) ||
-        (b.author && b.author.toLowerCase().includes(q))
-    ).slice(0, 5); // Limit to 5 results
-  }, [query, books]);
+  return books.filter(b => matchesBook(b, query));
+}, [books, query]);
+
+
+  /* ===================== HANDLERS ===================== */
 
   const handleSearch = (e) => {
     e.preventDefault();
-    if (query.trim()) {
-      navigate(`/search?q=${encodeURIComponent(query.trim())}`);
-      setShowSearch(false);
-      setQuery("");
-    }
+    if (!query.trim()) return;
+
+    navigate(`/search?q=${encodeURIComponent(query.trim())}`);
+    setQuery("");
+    setShowSearch(false);
+    setShowDesktopResults(false);
   };
 
   const handleResultClick = (id) => {
     navigate(`/book/${id}`);
-    setShowSearch(false);
     setQuery("");
+    setShowSearch(false);
+    setShowDesktopResults(false);
   };
 
-  const handleMenuOpen = (event) => {
-    setMenuAnchor(event.currentTarget);
-  };
+  const handleMenuOpen = (e) => setMenuAnchor(e.currentTarget);
+  const handleMenuClose = () => setMenuAnchor(null);
 
-  const handleMenuClose = () => {
-    setMenuAnchor(null);
-  };
+  /* ===================== SEARCH DROPDOWN ===================== */
 
-  // Reusable Dropdown Component for Desktop
   const SearchDropdown = () => (
     <Paper
       elevation={4}
@@ -82,17 +81,24 @@ export default function Header({ cartCount = 0, onCart, onToggleMode, mode, book
         mt: 1,
         zIndex: 3001,
         overflow: "hidden",
-        bgcolor: "rgba(255, 255, 255, 0.9)", // 👈 Semi-transparent
-        backdropFilter: "blur(4px)",
+        bgcolor: "#e5d9c4ff", // 👈 Semi-transparent
+        backdropFilter: "blur(6px)",
       }}
     >
-      <List dense sx={{ p: 0 }}>
+      <List dense sx={{ p: 1 }}>
         {filteredBooks.map((book) => (
           <React.Fragment key={book.id}>
             <ListItem
               component="button"
               onClick={() => handleResultClick(book.id)}
-              sx={{ '&:hover': { bgcolor: 'action.hover' }, border: 'none', background: 'transparent', width: '100%', textAlign: 'left', cursor: 'pointer' }}
+              sx={{
+                "&:hover": { bgcolor: "#fadaa2" },
+                border: "none",
+                background: "transparent",
+                width: "100%",
+                textAlign: "left",
+                cursor: "pointer",
+              }}
             >
               <ListItemAvatar>
                 <Avatar
@@ -104,15 +110,33 @@ export default function Header({ cartCount = 0, onCart, onToggleMode, mode, book
               <ListItemText
                 primary={book.title}
                 secondary={book.author}
-                primaryTypographyProps={{ variant: 'body2', fontWeight: 600, noWrap: true }}
-                secondaryTypographyProps={{ variant: 'caption', noWrap: true }}
+                primaryTypographyProps={{
+                  variant: "body2",
+                  fontWeight: 600,
+                  noWrap: true,
+                }}
+                secondaryTypographyProps={{ variant: "caption", noWrap: true }}
               />
             </ListItem>
             <Divider component="li" />
           </React.Fragment>
         ))}
-        <ListItem component="button" onClick={handleSearch} sx={{ bgcolor: "primary.light", justifyContent: "center", border: 'none', cursor: 'pointer', width: '100%' }}>
-          <Typography variant="caption" fontWeight={700} color="primary.contrastText">
+        <ListItem
+          component="button"
+          onClick={handleSearch}
+          sx={{
+            bgcolor: "primary.light",
+            justifyContent: "center",
+            border: "none",
+            cursor: "pointer",
+            width: "100%",
+          }}
+        >
+          <Typography
+            variant="caption"
+            fontWeight={700}
+            color="primary.contrastText"
+          >
             View all results
           </Typography>
         </ListItem>
@@ -133,12 +157,12 @@ export default function Header({ cartCount = 0, onCart, onToggleMode, mode, book
               width: "100%",
               height: "100%",
               zIndex: 2000,
-              p: 2,
+              p: {xs: 1, md: 2},
               display: { xs: "flex", sm: "none" },
               flexDirection: "column",
               alignItems: "center",
               bgcolor: "rgba(0,0,0,0.35)",
-              backdropFilter: "blur(4px)",
+              backdropFilter: "blur(1px)",
             }}
             onClick={() => setShowSearch(false)} // Close when clicking backdrop
           >
@@ -190,15 +214,29 @@ export default function Header({ cartCount = 0, onCart, onToggleMode, mode, book
                   width: "100%",
                   maxWidth: 480,
                   maxHeight: "60vh",
-                  overflowY: "auto"
+                  overflowY: "auto",
                 }}
                 onClick={(e) => e.stopPropagation()}
               >
                 {filteredBooks.map((book) => (
                   <React.Fragment key={book.id}>
-                    <ListItem component="button" onClick={() => handleResultClick(book.id)} sx={{ border: 'none', background: 'transparent', width: '100%', textAlign: 'left', cursor: 'pointer' }}>
+                    <ListItem
+                      component="button"
+                      onClick={() => handleResultClick(book.id)}
+                      sx={{
+                        border: "none",
+                        background: "transparent",
+                        width: "100%",
+                        textAlign: "left",
+                        cursor: "pointer",
+                      }}
+                    >
                       <ListItemAvatar>
-                        <Avatar variant="rounded" src={book.image} sx={{ width: 40, height: 55 }} />
+                        <Avatar
+                          variant="rounded"
+                          src={book.image}
+                          sx={{ width: 40, height: 55 }}
+                        />
                       </ListItemAvatar>
                       <ListItemText
                         primary={book.title}
@@ -240,19 +278,21 @@ export default function Header({ cartCount = 0, onCart, onToggleMode, mode, book
           }}
         >
           {/* DESKTOP SEARCH BAR */}
-          <Box sx={{ position: "relative", display: { xs: "none", sm: "block" } }}>
+          <Box
+            sx={{ position: "relative", display: { xs: "none", sm: "block" } }}
+          >
             <ClickAwayListener onClickAway={() => setShowDesktopResults(false)}>
               <Box>
                 <Box
                   sx={{
                     display: "flex",
                     alignItems: "center",
-                    bgcolor: "rgba(255,255,255,0.6)",
+                    bgcolor: "rgba(255,255,255,0.4)",
                     borderRadius: 2,
                     px: 1,
                     width: 220,
                     "&:focus-within": {
-                      bgcolor: "rgba(255,255,255,0.95)",
+                      bgcolor: "rgba(255,255,255,0.85)",
                     },
                   }}
                   component="form"
@@ -275,7 +315,9 @@ export default function Header({ cartCount = 0, onCart, onToggleMode, mode, book
                   </IconButton>
                 </Box>
                 {/* Desktop Live Results */}
-                {showDesktopResults && filteredBooks.length > 0 && <SearchDropdown />}
+                {showDesktopResults && filteredBooks.length > 0 && (
+                  <SearchDropdown />
+                )}
               </Box>
             </ClickAwayListener>
           </Box>
@@ -514,7 +556,7 @@ export default function Header({ cartCount = 0, onCart, onToggleMode, mode, book
           zIndex: 1100, // 👈 Lower than main header
           background:
             "linear-gradient(90deg, rgba(13,27,42,0.9) 0%, rgba(13,27,42,0.7) 20%, #FFB74D 50%, rgba(13,27,42,0.6) 80%, rgba(13,27,42,0.8) 100%)",
-          height: { xs: 20, sm: 40 }, // Thinner on mobile
+          height: { xs: 15, sm: 40 }, // Thinner on mobile
           justifyContent: "center",
           top: { xs: "100px", sm: "126px" }, // Adjusted for restored header height
         }}
@@ -524,7 +566,7 @@ export default function Header({ cartCount = 0, onCart, onToggleMode, mode, book
             justifyContent: "center",
             gap: { xs: 1.5, sm: 5 },
             minHeight: "30px !important",
-            display: { xs: "none", sm: "flex" } // Buttons hidden on mobile
+            display: { xs: "none", sm: "flex" }, // Buttons hidden on mobile
           }}
         >
           <Button sx={{ color: "#fff" }} onClick={() => navigate("/")}>
@@ -544,7 +586,6 @@ export default function Header({ cartCount = 0, onCart, onToggleMode, mode, book
           </Button>
         </Toolbar>
       </AppBar>
-
     </>
   );
 }
